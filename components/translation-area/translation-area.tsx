@@ -88,20 +88,22 @@ export default function TranslationArea() {
     setTranslation(null);
     setIsTranslating(true);
 
-    try {
-      const response = await translateAction({
-        apiKey,
-        src: srcLang.code,
-        dest: destLang.code,
-        text,
-      });
+    const response = await translateAction({
+      apiKey,
+      src: srcLang.code,
+      dest: destLang.code,
+      text,
+    });
 
-      setTranslation(response.translation);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setIsTranslating(false);
+    if (response.ok && response.data) {
+      setTranslation(response.data.translation);
+    } else if (response.error) {
+      setError(response.error);
+    } else {
+      setError("An unknown error occurred.");
     }
+
+    setIsTranslating(false);
   }, [apiKey, srcLang, destLang, text]);
 
   function swapLanguages() {
